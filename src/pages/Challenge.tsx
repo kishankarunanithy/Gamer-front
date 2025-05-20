@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { IChallenge } from "../@types";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { deleteChallenge, getChallengeById } from "../api";
 import SubmissionForm from "../components/SubmissionForm";
 import useAuthStore from "../store";
@@ -13,6 +13,9 @@ export default function Challenge() {
   const { user, token } = useAuthStore();
   const [showForm, setShowForm] = useState(false);
 
+  const location = useLocation();
+  const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
+
   const loadData = useCallback(async () => {
     if (id) {
       const newChallenge = await getChallengeById(Number.parseInt(id));
@@ -24,6 +27,16 @@ export default function Challenge() {
     loadData();
   }, [loadData]);
 
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        //navigate(location.pathname); //Suppression de la redirection
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, location.pathname]);
+
   const handleDelete = async () => {
     if (!challenge) return;
     if (!token) {
@@ -34,13 +47,22 @@ export default function Challenge() {
     if (confirm("Es-tu sûr de vouloir supprimer ce challenge ?")) {
       try {
         await deleteChallenge(challenge.id, token);
-        alert("Challenge supprimé !");
-        navigate("/");
+
+        navigate('/', { 
+        state: { 
+          successMessage: "Challenge supprimé avec succès." 
+        }
+      });
       } catch (error) {
         console.error("Erreur suppression :", error);
         alert("Erreur lors de la suppression.");
       }
     }
+  };
+
+  const handleSubmissionSuccess = () => {
+    setSuccessMessage("Votre participation a été enregistrée avec succès !");
+    loadData(); // Recharge les données pour afficher la nouvelle participation
   };
 
   if (!challenge) {
@@ -51,6 +73,7 @@ export default function Challenge() {
 
   return (
     <>
+      {successMessage && <div className="success-toast">{successMessage}</div>}
       <section className="challenge-content default-box-design">
         <div className="challenge-container">
           <section className="video-container">
@@ -87,13 +110,14 @@ export default function Challenge() {
                   </button>
                 </div>
               )}
-
-              <span className="category-color default-tag-design" style={{ backgroundColor: challenge.category.color }}>
-                {challenge.category.name}
-              </span>
-              <span className="difficulty-color default-tag-design" style={{ backgroundColor: challenge.difficulty.color }}>
-                {challenge.difficulty.name}
-              </span>
+              <div className="span-cat-and-diff">
+                <span className="category-color default-tag-design" style={{ backgroundColor: challenge.category.color }}>
+                  {challenge.category.name}
+                </span>
+                <span className="difficulty-color default-tag-design" style={{ backgroundColor: challenge.difficulty.color }}>
+                  {challenge.difficulty.name}
+                </span>
+              </div>
             </div>
 
             <article className="challenge-description">
@@ -101,7 +125,6 @@ export default function Challenge() {
             </article>
           </section>
         </div>
-
         <div className="align-button">
           {user ? (
             <button className="default-button" onClick={() => setShowForm(true)}>
@@ -114,10 +137,9 @@ export default function Challenge() {
           )}
         </div>
       </section>
-
       {showForm && challenge?.id !== undefined && (
         <section className="submission-form-section">
-          <SubmissionForm close={() => setShowForm(false)} challengeId={challenge.id} onSuccess={loadData} />
+          <SubmissionForm close={() => setShowForm(false)} challengeId={challenge.id} onSuccess={handleSubmissionSuccess} />
         </section>
       )}
 

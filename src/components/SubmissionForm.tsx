@@ -12,7 +12,6 @@ interface SubmissionFormProps {
 export default function SubmissionForm({ close, challengeId, onSuccess }: SubmissionFormProps){
     const [videoUrl, setVideoUrl] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const [success, setSucces] = useState(false);
 
     // Récupérer le token, il sera envoyé dans la requête HTTP vers l'API.
     const token = useAuthStore(state => state.token);
@@ -41,7 +40,6 @@ export default function SubmissionForm({ close, challengeId, onSuccess }: Submis
                 token
             );
 
-            setSucces(true);
             onSuccess();
             close();
 
@@ -55,8 +53,7 @@ export default function SubmissionForm({ close, challengeId, onSuccess }: Submis
         <div className="default-form-container default-form default-box-design">
             <form onSubmit={handleSubmit}>
                 <p className="default-text">Envoie nous tes exploits !</p>
-                {error && <div style={{ color: "red" }}>{error}</div>}
-                {success && <div style={{ color: "green"}}>Participation enregistrée !</div>}
+                {error && <div className="error-toast">{error}</div>}
 
                 <input 
                     type="text"

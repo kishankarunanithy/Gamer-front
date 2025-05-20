@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useLocation, useParams } from "react-router-dom"
 import '../App.css'
 import { useEffect, useState } from "react";
 import { IChallenges, IUser } from "../@types";
@@ -23,6 +23,9 @@ export default function Profil() {
     const [createdChallenges, setCreatedChallenges] = useState<IChallenges>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+
+    const location = useLocation();
+    const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
 
 
     
@@ -49,7 +52,16 @@ export default function Profil() {
         }
       };
       loadProfilData();
-    }, [id]);
+
+      if (successMessage) {
+        const timer = setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000); // 5000ms = 5 secondes
+  
+        // Nettoyer le timer si le composant est démonté
+        return () => clearTimeout(timer);
+      }
+    }, [id, successMessage]);
   
     if (loading) return <p>Chargement du profil...</p>;
     if (error) return <p className="error-message">{error}</p>;
@@ -58,6 +70,12 @@ export default function Profil() {
     return (
         <>
             <main className="profile">
+
+            {successMessage && (
+              <div className="toast-message success-toast">
+                <span>{successMessage}</span>
+              </div>
+            )}
 
                 <div className="perso-info">
                   {user?.id === player?.id ? (

@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ICategory, IDifficulty } from "../@types";
+import { ICategory, IChallenge, IDifficulty } from "../@types";
 import { addChallengeToApi, getCategories, getDifficulties, updateChallenge } from "../api/index";
 import useAuthStore from "../store"; 
 
@@ -17,9 +17,10 @@ interface Props {
     difficulty_id: number;
   };
   isModal?: boolean;
+  existingChallenges?: IChallenge[];
 }
 
-function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal }: Props) {
+function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal, existingChallenges }: Props) {
   const navigate = useNavigate();
 
   // États pour stocker les catégories, difficultés et erreurs éventuelles
@@ -90,21 +91,35 @@ function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal }: Pr
       difficulty_id: Number(formData.difficulty_id),
     };
 
+    
+    const nameExists = existingChallenges?.some(challenge => challenge.name === formData.name && challenge.id !== challengeId);
+        if (nameExists) {
+            setError("Ce nom de challenge existe déjà. Veuillez en choisir un autre.");
+            return; // Important: Arrêter la soumission si le nom existe déjà
+        }
   
     try {
       let responseData;
+      let successMessage ="";
   
       if (challengeId) {
         responseData = await updateChallenge(challengeId, payload, token);
+        successMessage = "Votre challenge à été modifié avec succès."
       } else {
         responseData = await addChallengeToApi(payload, token);
+        successMessage = "Votre challenge à été crée avec succès."
       }
   
       if (onFormSubmit) onFormSubmit();
-      navigate(`/challenges/${responseData.id}`);
+
+      navigate(`/challenges/${responseData?.id}`, { 
+        state: { 
+          successMessage: successMessage, 
+        }
+      });
   
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      console.error("Une erreur s'est produite.", error);
     }
   };
   
@@ -117,11 +132,7 @@ function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal }: Pr
       {challengeId ? "Modifier le Challenge" : "Créer un Challenge"}
     </p>
 
-    {error && (
-      <p style={{ color: "white", textAlign: "center", background: "red" }}>
-        {error}
-      </p>
-    )}
+    {error && <div className="error-toast">{error}</div>}
 
     <input
       type="text"

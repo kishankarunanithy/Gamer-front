@@ -199,6 +199,7 @@ export async function forgotPasswordRequest (email: string): Promise<IForgotPass
 
 
   //* Si l'email correspond à un utilisateur un lien est envoyé sur sa boite mail
+  //* Un token sera alors généré
   const data: IForgotPasswordResponse = await result.json();
   return data
 }

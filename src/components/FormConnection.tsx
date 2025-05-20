@@ -220,7 +220,11 @@ function FormLogin () {
      
       //  Redirection dynamique
       const redirect = searchParams.get("redirect");
-      navigate(redirect || `/profile/${user.id}`);
+      navigate(redirect || `/profile/${user.id}`, { 
+        state: { 
+          successMessage: `Bienvenu ${user.pseudo} !` 
+        }
+      });
 
     } catch (error) {
       setError("Échec de la connexion. Vérifiez vos identifiants.");
@@ -234,14 +238,6 @@ function FormLogin () {
       {successMessage && (
         <div className="toast-message success-toast">
           <span>{successMessage}</span>
-          <button 
-            type="button"
-            className="toast-close"
-            onClick={() => setSuccessMessage(null)}
-            aria-label="Fermer le message"
-          >
-            ×
-          </button>
         </div>
       )}
 

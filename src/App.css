@@ -365,14 +365,25 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .success-toast {
+  text-align: center;
   background-color: #11f0459b;
   color: #d4edda;
   padding: 0.50rem;
-  margin-bottom: 1rem;
+  max-width: 40%;
+  margin: 1rem auto;
   border: 1px solid #c3e6cb;
   border-radius: 4px;
   font-weight: 500;
   font-size: 0.85rem;
+  font-family: var(--second-font-text);
+}
+
+.error-toast {
+  background-color: rgba(255, 0, 0, 0.735);
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  width: 95%;
+  text-align: center;
   font-family: var(--second-font-text);
 }
 
@@ -990,6 +1001,7 @@ input[type="file"]::file-selector-button:hover {
 
 .challenge-cat-and-diff {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
@@ -998,14 +1010,24 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .challenge-actions-inline {
+  width: 100%;
+  margin-right: 3rem;
   display: flex;
+  justify-content: flex-end;
   gap: 0.75rem;
-  margin-left: auto;
   margin-bottom: 1rem;
 }
 
+.span-cat-and-diff {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex-wrap: nowrap;
+}
+
 .icon-button {
-  background: var(--secondary-background);
+  background: none;
   color: var(--text-color-secondary);
   border: none;
   border-radius: 50%;
@@ -1052,7 +1074,7 @@ input[type="file"]::file-selector-button:hover {
   color: var(--text-color);
   margin-top: 4rem;
   margin-bottom: 1.5rem;
-  text-align: left;
+  text-align: center;
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 0.75rem;
 }
@@ -1128,7 +1150,7 @@ input[type="file"]::file-selector-button:hover {
   --card-background: #1e1e1e;
   --secondary-background: #2c2c2c;
   --text-color: #f0f0f0;
-  --text-color-secondary: #a9a9a9;
+  --text-color-secondary: #c9c9c9;
   --border-color: #444;
   --border-radius: 12px;
   --shadow-box: 0 4px 8px rgba(0, 0, 0, 0.3);
