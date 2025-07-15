@@ -3,6 +3,9 @@ import { IUser } from "../@types";
 import { addUserIntoApi, getUsers } from "../api";
 import { FormLogin, FormSubscribe } from "../components/FormConnection";
 import { useNavigate } from "react-router-dom";
+import loginImage from '../../public/img/4000_4_08-removebg-preview.png';
+import signupImage from '../../public/img/4000_4_10-removebg-preview.png';
+import { useToast } from "../context/ToastContext";
 import loginImage from '../assets/dino-login.png';
 import signupImage from '../assets/dino-signup.png';
 
@@ -10,13 +13,15 @@ function Connection () {
     const [users, setUsers] = useState<IUser[]>([]);
     const navigate = useNavigate();
     const [showLogin, setShowLogin] = useState(true);
-
+    const showToast  = useToast();
     const addUser = async(pseudo: string, email: string, password: string, confirmPassword: string,  avatar: File | null): Promise<void> => {
         const newUser = await addUserIntoApi(pseudo, email, password, confirmPassword, avatar);
         if (newUser) {
+            showToast("Utilisateur créé avec succès.", "success");
             const newUsers = [...users, newUser];
             setUsers(newUsers);
-            setShowLogin(true);
+        } else {
+            showToast("Erreur lors de la création de l'utilisateur.", "error");
         }
     };
 
@@ -25,8 +30,14 @@ function Connection () {
             const newUsers = await getUsers();
             setUsers(newUsers);
         };
-        loadData();
-    }, []);
+        try {
+            loadData();
+            setShowLogin(true);
+        } catch (error) {
+            console.error(error);
+            showToast("Erreur lors du chargement des données.", "error");
+        }
+    }, [showToast]);
 
     const toggleForm = () => {
         setShowLogin(!showLogin);

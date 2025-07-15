@@ -14,7 +14,7 @@ export default function Creation() {
     } else {
       setChecking(false);
     }
-  }, [user]);
+  }, [user, navigate]);
 
   if (checking) return <p className="paragraph-center">Chargement...</p>;
 
