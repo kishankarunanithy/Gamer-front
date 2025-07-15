@@ -62,7 +62,7 @@ export default function Leaderboard() {
                             <thead>
                                 <tr className="array-header">
                                     <th className="default-text" scope="col">Rang</th>
-                                    <th className="default-text" scope="col">Pseudo</th>
+                                    <th className="default-text" scope="col">Challenge</th>
                                     <th className="default-text" scope="col">Participations</th>
                                 </tr>
                             </thead>
