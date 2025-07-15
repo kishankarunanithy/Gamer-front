@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./style.css";
 import logo from "../../assets/logo-transparent.svg";
 import BurgerIcon from "./BurgerIcon";
+import CloseIcon from "./CloseIcon"; // Importez le composant CloseIcon
 import { NavLink, Link } from "react-router-dom";
 import useAuthStore from "../../store";
 
@@ -37,48 +38,12 @@ export default function Header() {
                 setMenuOpen(false);
             }
         };
-
-        // Ajoute un écouteur d'évenement lors du redimensionnement de la fenêtre.
         window.addEventListener('resize', checkScreenSize);
-
-        // Appelle la fonction immédiatement pour gérer le cas initial.
         checkScreenSize();
-
-        // Nettoie l'écouteur lors du démontage du composant.
         return () => {
             window.removeEventListener('resize', checkScreenSize)
         };
-    }, [menuOpen]) // S'exécute à chaque changement de menuOpen, mais agit uniquement si menuOpen est ouvert.
-
-    // Fermer le menu burger si clic en dehors du menu fullscreen ET du bouton burger.
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuOpen) {
-                // Vérifie si le clic est en dehors du contenu du menu fullscreen
-                const clickOutsideFullscreenContent = fullscreenMenuRef.current && !fullscreenMenuRef.current.contains(event.target as Node);
-                // Vérifie si le clic est en dehors du bouton burger
-                const clickOutsideBurger = burgerRef.current && !burgerRef.current.contains(event.target as Node);
-
-                // Fermer le menu si le clic est en dehors du contenu du menu *et* du bouton burger
-                if (clickOutsideFullscreenContent && clickOutsideBurger) {
-                    setMenuOpen(false);
-                }
-            }
-        };
-        // Ajoute un écouteur sur tous les clics de la page.
-        document.addEventListener("mousedown", handleClickOutside);
-
-        // Nettoie l'écouteur lors du démontage du composant.
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [menuOpen]); // Dépend de menuOpen
-
-
-    // Fonction pour fermer le menu lorsqu'un lien est cliqué
-    const handleNavLinkClick = () => {
-        setMenuOpen(false);
-    };
+    }, [menuOpen])
 
     return (
         <header className="header">
@@ -90,7 +55,6 @@ export default function Header() {
 
             {/* NAVBAR DESKTOP */}
             <ul ref={menuRef} className={`navbar desktop-only`}>
-                
                 <li><Link to="/" className="link-color">ACCUEIL</Link></li>
                 <li><Link to="/challenges" className="link-color">CHALLENGES</Link></li>
                 <li><Link to="/leaderboard" className="link-color">CLASSEMENT</Link></li>
@@ -116,18 +80,18 @@ export default function Header() {
             </div>
 
             {/* BOUTON BURGER MOBILE */}
-            <button ref={burgerRef} className="burger mobile-only" onClick={() => setMenuOpen(!menuOpen)}>
+            <button ref={burgerRef} className="burger mobile-only" onClick={() => setMenuOpen(true)}>
                 <BurgerIcon />
             </button>
 
             {/* MENU FULLSCREEN MOBILE */}
             {menuOpen && (
-                <div className="fullscreen-menu" onClick={() => setMenuOpen(false)}>
+                <div className="fullscreen-menu">
                     <nav ref={fullscreenMenuRef} className="fullscreen-content" onClick={(e) => e.stopPropagation()}>
                         <ul className="fullscreen-links">
                             {user && (
                                 <li>
-                                    <NavLink to={`/profile/${user.id}`} className="link-color" onClick={handleNavLinkClick}>
+                                    <NavLink to={`/profile/${user.id}`} className="link-color" onClick={() => setMenuOpen(false)}>
                                         <img
                                             src={localAvatarUrl ? localAvatarUrl : undefined}
                                             alt={`Profil de ${user.pseudo}`}
@@ -137,17 +101,17 @@ export default function Header() {
                                 </li>
                             )}
                             <li>
-                                <NavLink to="/" className="link-color" onClick={handleNavLinkClick}>
+                                <NavLink to="/" className="link-color" onClick={() => setMenuOpen(false)}>
                                 🏠 Accueil
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="/challenges" className="link-color" onClick={handleNavLinkClick}>
+                                <NavLink to="/challenges" className="link-color" onClick={() => setMenuOpen(false)}>
                                 🎯 Challenges
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="/leaderboard" className="link-color" onClick={handleNavLinkClick}>
+                                <NavLink to="/leaderboard" className="link-color" onClick={() => setMenuOpen(false)}>
                                 🏆 Classement
                                 </NavLink>
                             </li>
@@ -157,24 +121,24 @@ export default function Header() {
                         </div>
                         <div className="fullscreen-footer">
                             {!user ? (
-                                <NavLink to="/connexion" className="default-button" onClick={handleNavLinkClick}>
+                                <NavLink to="/connexion" className="default-button" onClick={() => setMenuOpen(false)}>
                                     Se connecter
                                 </NavLink>
                             ) : (
-                                <NavLink to="/logout" className="default-button" onClick={handleNavLinkClick}>
+                                <NavLink to="/logout" className="default-button" onClick={() => setMenuOpen(false)}>
                                     Se déconnecter
                                 </NavLink>
                             )}
                         </div>
                     </nav>
+                    {/* Ajouter la croix ici */}
+                    <button className="close-button-fullscreen" onClick={() => setMenuOpen(false)}>
+                        <CloseIcon />
+                    </button>
                 </div>
             )}
         </header>
     )
 }
-
-
-
-        
         
 

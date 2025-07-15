@@ -5,14 +5,22 @@ import { IChallenge } from "../@types/index";
 import useAuthStore from "../store"; // 🔒 pour vérifier si user connecté
 import { getChallenges } from "../api";
 import { getYoutubeThumbnailUrl } from "../utils/youtube";
-import heroLeftImage from "../../public/img/astronaute-mignon-agitant-main-controleur-jeu-cartoon-vector-icon-illustration-concept-icone-science-technologie-isole-vecteur-premium-style-dessin-anime-plat.png";
-import heroseparatorImage from "../../public/img/Capture_d_écran_2025-05-18_à_11.30.20-removebg-preview.png"
+import heroLeftImage from "../assets/dino-home.png";
+import heroseparatorImage from "../assets/Capture_d_écran_2025-05-18_à_11.30.20-removebg-preview.png"
 
 export default function Home() {
   const [challenges, setChallenges] = useState<IChallenge[]>([]);
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user); // ✅ check Zustand
   const [popularChallenges, setPopularChallenges] = useState<IChallenge[]>([]);
+  const nouveauteCarouselRef = useRef<HTMLDivElement>(null);
+  const populairesCarouselRef = useRef<HTMLDivElement>(null);
+  const [isNouveauteDragging, setIsNouveauteDragging] = useState(false);
+  const [nouveauteStartX, setNouveauteStartX] = useState(0);
+  const [nouveauteScrollLeft, setNouveauteScrollLeft] = useState(0);
+  const [isPopulairesDragging, setIsPopulairesDragging] = useState(false);
+  const [populairesStartX, setPopulairesStartX] = useState(0);
+  const [populairesScrollLeft, setPopulairesScrollLeft] = useState(0);
 
   const location = useLocation();
   const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
@@ -28,9 +36,9 @@ export default function Home() {
           // Trier les challenges par popularité.
           const sortedByPopularity = [...data].sort((a, b) => b.users.length - a.users.length);
           setPopularChallenges(sortedByPopularity.slice(0, 10));
-        } 
+        }
 
-        
+
         else console.error("Les données reçues ne sont pas un tableau :", data);
       } catch (error) {
         console.error("Erreur lors du fetch des challenges :", error);
@@ -50,8 +58,70 @@ export default function Home() {
 
   }, [successMessage]);
 
-  
-  
+  const handleNouveauteMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsNouveauteDragging(true);
+    setNouveauteStartX(e.pageX - (nouveauteCarouselRef.current?.offsetLeft || 0));
+    setNouveauteScrollLeft(nouveauteCarouselRef.current?.scrollLeft || 0);
+    if (nouveauteCarouselRef.current) {
+      nouveauteCarouselRef.current.style.scrollBehavior = 'auto'; // Désactiver le scroll smooth pendant le drag
+    }
+  };
+
+  const handleNouveauteMouseLeave = () => {
+    setIsNouveauteDragging(false);
+    if (nouveauteCarouselRef.current) {
+      nouveauteCarouselRef.current.style.scrollBehavior = 'smooth'; // Réactiver le scroll smooth
+    }
+  };
+
+  const handleNouveauteMouseUp = () => {
+    setIsNouveauteDragging(false);
+    if (nouveauteCarouselRef.current) {
+      nouveauteCarouselRef.current.style.scrollBehavior = 'smooth'; // Réactiver le scroll smooth
+    }
+  };
+
+  const handleNouveauteMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isNouveauteDragging) return;
+    if (nouveauteCarouselRef.current) {
+      const x = e.pageX - (nouveauteCarouselRef.current.offsetLeft || 0);
+      const walk = (x - nouveauteStartX) * 1; // Ajuster la sensibilité du drag
+      nouveauteCarouselRef.current.scrollLeft = nouveauteScrollLeft - walk;
+    }
+  };
+
+  const handlePopulairesMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsPopulairesDragging(true);
+    setPopulairesStartX(e.pageX - (populairesCarouselRef.current?.offsetLeft || 0));
+    setPopulairesScrollLeft(populairesCarouselRef.current?.scrollLeft || 0);
+    if (populairesCarouselRef.current) {
+      populairesCarouselRef.current.style.scrollBehavior = 'auto'; // Désactiver le scroll smooth pendant le drag
+    }
+  };
+
+  const handlePopulairesMouseLeave = () => {
+    setIsPopulairesDragging(false);
+    if (populairesCarouselRef.current) {
+      populairesCarouselRef.current.style.scrollBehavior = 'smooth'; // Réactiver le scroll smooth
+    }
+  };
+
+  const handlePopulairesMouseUp = () => {
+    setIsPopulairesDragging(false);
+    if (populairesCarouselRef.current) {
+      populairesCarouselRef.current.style.scrollBehavior = 'smooth'; // Réactiver le scroll smooth
+    }
+  };
+
+  const handlePopulairesMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isPopulairesDragging) return;
+    if (populairesCarouselRef.current) {
+      const x = e.pageX - (populairesCarouselRef.current.offsetLeft || 0);
+      const walk = (x - populairesStartX) * 1; // Ajuster la sensibilité du drag
+      populairesCarouselRef.current.scrollLeft = populairesScrollLeft - walk;
+    }
+  };
+
   return (
     <main className="home-page">
 
@@ -92,7 +162,7 @@ export default function Home() {
             >
               <span>🚀 Participer</span>
             </button>
-            
+
           </div>
           <div className="hero-separator"> {/* Barre de séparation */}
           <img src={heroseparatorImage} alt="Image de gauche" />
@@ -113,15 +183,22 @@ export default function Home() {
       <section className="home-carousel-section">
   <div className="home-carousel-block">
     <h3 className="low-title">🎬 Nouveautés</h3>
-    <div className="home-carousel-container">
-      
-      <div id="home-nouveaute" className="home-carousel-items">
-        
+    <div
+      className="home-carousel-container"
+      ref={nouveauteCarouselRef}
+      onMouseDown={handleNouveauteMouseDown}
+      onMouseLeave={handleNouveauteMouseLeave}
+      onMouseUp={handleNouveauteMouseUp}
+      onMouseMove={handleNouveauteMouseMove}
+    >
+
+      <div id="home-nouveaute" className="home-carousel-items nouveaute">
+
         {challenges.slice(0, 10).map((challenge) => {
           const thumbnailUrl = getYoutubeThumbnailUrl(challenge.video_url);
           return (
             <Link
-              key={`original-${challenge.id}`} 
+              key={`original-${challenge.id}`}
               to={`/challenges/${challenge.id}`}
               className="home-video-card"
             >
@@ -135,12 +212,12 @@ export default function Home() {
             </Link>
           );
         })}
-       
+
         {challenges.slice(0, 10).map((challenge) => {
           const thumbnailUrl = getYoutubeThumbnailUrl(challenge.video_url);
           return (
             <Link
-              key={`duplicate-${challenge.id}`} 
+              key={`duplicate-${challenge.id}`}
               to={`/challenges/${challenge.id}`}
               className="home-video-card"
             >
@@ -155,20 +232,27 @@ export default function Home() {
           );
         })}
       </div>
-      
+
     </div>
   </div>
 </section>
 <section className="home-carousel-section">
   <div className="home-carousel-block">
     <h3 className="low-title">🏆 Challenges populaires</h3>
-    <div className="home-carousel-container">
-      
+    <div
+      className="home-carousel-container"
+      ref={populairesCarouselRef}
+      onMouseDown={handlePopulairesMouseDown}
+      onMouseLeave={handlePopulairesMouseLeave}
+      onMouseUp={handlePopulairesMouseUp}
+      onMouseMove={handlePopulairesMouseMove}
+    >
+
       <div
         id="home-populaires"
-        className="home-carousel-items reversed" 
+        className="home-carousel-items populaires reversed"
       >
-        
+
         {popularChallenges.slice(0, 10).map((challenge) => {
           const thumbnailUrl = getYoutubeThumbnailUrl(challenge.video_url);
           return (
@@ -187,12 +271,12 @@ export default function Home() {
             </Link>
           );
         })}
-        
+
         {popularChallenges.slice(0, 10).map((challenge) => {
           const thumbnailUrl = getYoutubeThumbnailUrl(challenge.video_url);
           return (
             <Link
-              key={`duplicate-${challenge.id}`} 
+              key={`duplicate-${challenge.id}`}
               to={`/challenges/${challenge.id}`}
               className="home-video-card"
             >
@@ -207,7 +291,7 @@ export default function Home() {
           );
         })}
       </div>
-      
+
     </div>
   </div>
 </section>

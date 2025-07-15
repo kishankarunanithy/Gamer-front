@@ -24,6 +24,7 @@ export default function Profil() {
     const [createdChallenges, setCreatedChallenges] = useState<IChallenges>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const showToast = useToast();
+    const baseUrl = import.meta.env.VITE_API_URL;
 
 
     
@@ -81,7 +82,7 @@ export default function Profil() {
                     <div className="avatar-container">
                     <img
                         className="avatar"
-                        src={`${import.meta.env.VITE_API_URL}/${player?.avatar_url}`}
+                        src={`${baseUrl}/uploads/${player?.avatar_url}`}
                         alt={`Avatar de ${player?.pseudo || "l'utilisateur"}`}
                         style={{ width: '100px', height: '100px', borderRadius: '50%' }}
                     />
@@ -96,16 +97,16 @@ export default function Profil() {
 
                 <article className="chall">
                   {player?.id === user?.id ? (
-                    <h3 className="chall-title low-title">Mes participations</h3>
+                    <h3 className="chall-title">Mes participations</h3>
                   ) : (
-                    <h3 className="chall-title low-title">Participations</h3>
+                    <h3 className="chall-title">Participations</h3>
                   )}
 
 
                     <div className="chall-flex">
                         <span className="arrow" onClick={() => scroll("completed", "left")}>❮</span>
 
-                        <div id="completed" className="chall-flex">
+                        <div id="completed" className="chall-flex-inside">
                         
                             {player?.challenges.map((challenge) => {
                                 return <CompletedChall key={challenge.id} challenge={challenge} userId={player.id} />
@@ -123,16 +124,16 @@ export default function Profil() {
                 <article className="chall">
                   
                   {player?.id === user?.id ? (
-                    <h3 className="chall-title low-title">Mes challenges créés</h3>
+                    <h3 className="chall-title">Mes challenges créés</h3>
                   ) : (
-                    <h3 className="chall-title low-title">Challenges créés</h3>
+                    <h3 className="chall-title">Challenges créés</h3>
                   )}
                   
 
                   <div className="chall-flex">
                     <span className="arrow" onClick={() => scroll("created", "left")}>❮</span>
 
-                    <div id="created" className="chall-flex">
+                    <div id="created" className="chall-flex-inside">
                       {createdChallenges.map((challenge) => {
                         return <CreatedChall key={challenge.id} challenge={challenge}/>
                       })}

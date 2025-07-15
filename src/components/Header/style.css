@@ -1,4 +1,3 @@
-
 /* === HEADER FINAL GAMER CHALLENGES === */
 
 /* ========== GLOBAUX ========== */
@@ -10,8 +9,7 @@
 }
 
 .logo {
-  width: 750px;
-  
+  width: 400px; /* Réduction de la largeur du logo pour un meilleur affichage mobile */
 }
 
 a {
@@ -29,14 +27,14 @@ a:active {
 
 .profil-picture {
   border-radius: 50%;
-  height: 40px;
-  width: 40px;
+  height: 60px;
+  width: 60px;
   object-fit: cover;
-  padding-left: 20px;
+  margin-left: 1rem; 
 }
 
 .profil-picture.mobile-only {
-  margin: 1rem 2.5rem;
+  margin: 1rem auto; 
   height: 60px;
   width: 60px;
 }
@@ -100,7 +98,7 @@ a:active {
 
 
 /* ========== MENU BURGER ========== */
-.burger {
+.burger.mobile-only {
   position: fixed;
   background: none;
   border: none;
@@ -111,10 +109,30 @@ a:active {
   height: 3rem;
   display: grid;
   place-items: center;
-  border-radius: 3rem;
-  color: white;
+  border-radius: 50%; 
+  color: white; 
 }
 
+.burger.mobile-only > svg { 
+  width: 100%;
+  height: 100%;
+  color: white; 
+}
+.close-button-fullscreen {
+  position: absolute; 
+  top: 2rem;
+  right: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  color: white; 
+}
+
+.close-button-fullscreen svg {
+  width: 2rem;
+  height: 2rem;
+}
 /* ========== NAVBAR DESKTOP ========== */
 .navbar {
   display: none;
@@ -172,13 +190,12 @@ a:active {
   margin-bottom: 1rem;
   display: flex;
   justify-content: center;
-  width: 750px;
+  width: 100%; 
 }
 
 .fullscreen-logo img {
-  
   height: auto;
-  max-width: 80%; 
+  max-width: 80%;
 }
 
 .fullscreen-links {
@@ -249,6 +266,7 @@ a:active {
 @media screen and (min-width: 768px) {
   .desktop-only {
     display: flex !important;
+    align-items: center;
   }
 
   .mobile-only {
@@ -259,19 +277,43 @@ a:active {
     display: none !important;
   }
 
+  .header {
+    padding: 1rem 3rem;
+  }
+
+  .logo {
+    
+    max-height: 140px;
+  }
+  .logo img {
+    max-height: 100%; 
   .navbar.desktop-only {
     display: flex !important;
     flex-direction: row;
-    justify-content: space-evenly;
-    width: 50%;
-    position: static;
+    justify-content: flex-end;
+    width: auto;
+    margin-left: auto;
+  }
+
+  .navbar.desktop-only li {
+    list-style-type: none;
+    padding: 0 1rem;
+  }
+
+  .navbar.desktop-only li a.link-color {
+    font-size: 1rem;
+  }
+
+  .desktop-only .default-button {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+  }
+
+  .desktop-only .profil-picture {
+    height: 30px;
+    width: 30px;
+    margin-left: 0.8rem;
   }
 }
-
-
-
-  
-  
-  
-
-
+}

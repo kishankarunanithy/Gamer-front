@@ -62,7 +62,7 @@ export default function Leaderboard() {
                             <thead>
                                 <tr className="array-header">
                                     <th className="default-text" scope="col">Rang</th>
-                                    <th className="default-text" scope="col">Pseudo</th>
+                                    <th className="default-text" scope="col">Challenge</th>
                                     <th className="default-text" scope="col">Participations</th>
                                 </tr>
                             </thead>
@@ -72,23 +72,7 @@ export default function Leaderboard() {
                                         return <LeaderboardTopChallenges key={challenge.id} challenge={challenge} index={index} />
                                     })}
                                 </tr>
-                            </tbody>
-                            <tfoot>
-                                    <tr>
-                                    {user ? (
-                                            userRank !== -1 ? (
-                                                <td className="default-text perso-leader-sentence">Vous êtes classé {userRank + 1}e avec {currentPlayer?.challenges.length} challenges réalisés</td>
-                                            ) : (
-                                                <td className="default-text perso-leader-sentence" >Vous n'apparaissez pas encore dans le classement</td>
-                                            )
-                                    ) : (
-
-                                        <section>
-                                            <td className="default-text perso-leader-sentence">Connectez-vous pour voir votre classement personnel</td>
-                                        </section>
-                                    )}
-                                    </tr>
-                            </tfoot>     
+                            </tbody>     
                         </table>
                     </section>
 

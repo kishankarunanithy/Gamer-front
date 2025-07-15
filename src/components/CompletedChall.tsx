@@ -131,7 +131,10 @@ export default function CompletedChall({ challenge, userId }: CompletedChallenge
                                 </p>
                             )}
             </div>
-            <Link to={`/challenges/${challenge.id}`} className="default-button card-details">Détails</Link>
+
+            <div className='button-center'>
+                <Link to={`/challenges/${challenge.id}`} className="default-button card-details">Détails</Link>
+            </div>
         </article>
     );
 }
