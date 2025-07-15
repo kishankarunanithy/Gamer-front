@@ -1357,21 +1357,22 @@ input[type="file"]::file-selector-button:hover {
     justify-content: center;
     gap: 40px;
     padding: 0 2rem;
+  }
 
-    .leaderbord-lists {
-      padding: 1rem 2rem;
-      min-height: 40rem;
-    }
-  
-    .best-challenges {
+  .leaderbord-lists {
+    padding: 1rem 2rem;
+    min-height: 40rem;
+  }
+
+  .best-challenges {
+    width: 40rem;
+  }
+
+  .best-players {
       width: 40rem;
-    }
-  
-    .best-players {
-        width: 40rem;
-    }
+  }
 }
-}
+
 
 /**? ============================================ */
 /**? ===== LEADERBOARD PAGE DESKTOP DISPLAY ===== */
