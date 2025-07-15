@@ -3,11 +3,9 @@ import { IUser } from "../@types";
 import { addUserIntoApi, getUsers } from "../api";
 import { FormLogin, FormSubscribe } from "../components/FormConnection";
 import { useNavigate } from "react-router-dom";
-import loginImage from '../../public/img/4000_4_08-removebg-preview.png';
-import signupImage from '../../public/img/4000_4_10-removebg-preview.png';
-import { useToast } from "../context/ToastContext";
 import loginImage from '../assets/dino-login.png';
 import signupImage from '../assets/dino-signup.png';
+import { useToast } from "../context/ToastContext";
 
 function Connection () {
     const [users, setUsers] = useState<IUser[]>([]);

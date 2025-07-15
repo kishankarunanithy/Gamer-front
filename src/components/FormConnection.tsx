@@ -443,7 +443,7 @@ const ForgotPasswordForm = () => {
             value={email}
             setValue={setEmail}
             name="email"
-            placeholder="Votre addresse email"
+            placeholder="Votre adresse email"
             type="email" 
             label="Email"
           />
