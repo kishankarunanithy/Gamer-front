@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { IChallenge } from "../@types";
-import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { deleteChallenge, getChallengeById } from "../api";
 import SubmissionForm from "../components/SubmissionForm";
 import useAuthStore from "../store";
 import { getYoutubeEmbedUrl } from "../utils/youtube";
+import { useToast } from "../context/ToastContext";
 
 export default function Challenge() {
   const { id } = useParams();
@@ -12,9 +13,7 @@ export default function Challenge() {
   const [challenge, setChallenge] = useState<IChallenge | null>(null);
   const { user, token } = useAuthStore();
   const [showForm, setShowForm] = useState(false);
-
-  const location = useLocation();
-  const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
+  const showToast = useToast();
 
   const loadData = useCallback(async () => {
     if (id) {
@@ -27,15 +26,6 @@ export default function Challenge() {
     loadData();
   }, [loadData]);
 
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage(null);
-        //navigate(location.pathname); //Suppression de la redirection
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage, location.pathname]);
 
   const handleDelete = async () => {
     if (!challenge) return;
@@ -48,11 +38,8 @@ export default function Challenge() {
       try {
         await deleteChallenge(challenge.id, token);
 
-        navigate('/', { 
-        state: { 
-          successMessage: "Challenge supprimé avec succès." 
-        }
-      });
+        navigate('/');
+        showToast("Challenge supprimé avec succès.", "success");
       } catch (error) {
         console.error("Erreur suppression :", error);
         alert("Erreur lors de la suppression.");
@@ -61,7 +48,7 @@ export default function Challenge() {
   };
 
   const handleSubmissionSuccess = () => {
-    setSuccessMessage("Votre participation a été enregistrée avec succès !");
+    showToast("Votre participation a été enregistrée avec succès !", "success");
     loadData(); // Recharge les données pour afficher la nouvelle participation
   };
 
@@ -73,7 +60,6 @@ export default function Challenge() {
 
   return (
     <>
-      {successMessage && <div className="success-toast">{successMessage}</div>}
       <section className="challenge-content default-box-design">
         <div className="challenge-container">
           <section className="video-container">

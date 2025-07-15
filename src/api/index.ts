@@ -5,6 +5,9 @@ const baseUrl = import.meta.env.VITE_API_URL;
 export async function getChallenges(): Promise<IChallenges> {
   const response = await fetch(`${baseUrl}/challenges`);
   const challenges = await response.json();
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer les challenges.");
+  }
   return challenges;
 }
 
@@ -13,19 +16,26 @@ export async function getChallengeById(id: number): Promise<IChallenge> {
     `${baseUrl}/challenges/${id}`
   );
   const challenge = await response.json();
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer le challenge.");
+  }
   return challenge;
 }
 
 export async function getChallengesByUser(id: number): Promise<IChallenges> {
   const response = await fetch(`${baseUrl}/users/${id}/challenges`);
   if (!response.ok) {
-    throw new Error("Impossible de récupérer les challenges créés par l'utilisateur.");
+    const error = await response.json();
+    throw new Error(error.message || "Impossible de récupérer les challenges créés par l'utilisateur.");
   }
   return await response.json();
 }
 
 export async function getChallengesCreatedByUser(userId: number): Promise<IChallenges> {
   const response = await fetch(`${baseUrl}/challenges/user/${userId}`);
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer les challenges créés par l'utilisateur.");
+  }
   return await response.json();
 }
 
@@ -43,7 +53,8 @@ export async function loginUser(pseudoOrEmail: string, password: string): Promis
   })
   
   if (!response.ok) {
-    throw new Error("Nom d'utilisateur ou mot de passe incorrect");
+    const error = await response.json();
+    throw new Error(error.message || "Nom d'utilisateur ou mot de passe incorrect");
   }
   return response.json();
 }
@@ -97,8 +108,7 @@ export async function addUserIntoApi(
       const newUser: IUser = await result.json();
       return newUser;
     }
-
-    return null;
+    throw new Error("Impossible d'ajouter l'utilisateur.");
   } catch (error) {
     console.error("Erreur lors de l'ajout de l'utilisateur", error);
     return null;
@@ -134,8 +144,7 @@ export async function updateUserIntoApi(
       const updatedUser: IUser = await result.json();
       return updatedUser;
     }
-
-    return null;
+    throw new Error("Impossible de mettre à jour le profil.");
   } catch (error) {
     console.error("Erreur lors de la mise à jour du profile", error);
     return null;
@@ -171,11 +180,10 @@ export async function updateUserPasswordIntoApi(
       const updatedUserPassword: IUser = await result.json();
       return updatedUserPassword;
     }
-
-    return null;
+    throw new Error("Impossible de mettre à jour le mot de passe.");
   } catch (error) {
     console.error("Erreur lors de la mise à jour du profile", error);
-    return null;
+    throw new Error("Impossible de mettre à jour le mot de passe.");
   }  
 }
 
@@ -235,7 +243,7 @@ export async function addSubmissionToChallenge(challengeId: number, videoUrl: st
   })
   if (!response.ok) {
     console.error(response);
-    return null;
+    throw new Error("Impossible d'ajouter la soumission.");
   }
   return await response.json();
 }
@@ -251,7 +259,7 @@ export async function updateUserSubmission(userId: number, challengeId: number, 
   })
   if (!response.ok) {
     console.error(response);
-    return null;
+    throw new Error("Impossible de mettre à jour la soumission.");
   }
   return await response.json()
 }
@@ -263,7 +271,7 @@ export async function deleteUserSubmission(userId: number, challengId: number, t
   });
   if(!response.ok) {
     console.error(response);
-    return null;
+    throw new Error("Impossible de supprimer la soumission.");
   }
   return true;
 }
@@ -292,7 +300,7 @@ export async function updateChallenge(
     return await response.json();
   } catch (err) {
     console.error("Erreur API updateChallenge :", err);
-    throw err; // On relance l’erreur pour la catch dans le form
+    throw new Error("Erreur lors de la modification du challenge.");
   }
 }
 
@@ -347,5 +355,10 @@ export async function deleteUser(userId: number, token: string): Promise<boolean
     }
   });
 
-  return response.ok;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Erreur lors de la suppression.");
+  }
+
+  return true;
 }

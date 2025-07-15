@@ -3,14 +3,13 @@ import '../App.css'
 import { IChallenge } from "../@types"
 import { Link } from 'react-router-dom'
 import { getYoutubeEmbedUrl } from '../utils/youtube';
-
 interface CreatedChallenges {
     challenge: IChallenge
 }
 
 export default function CreatedChall({ challenge }: CreatedChallenges) {
-
     const embedUrl = getYoutubeEmbedUrl(challenge.video_url);
+
 
     return (
 

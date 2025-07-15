@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import '../App.css'
 import { useEffect, useState } from "react";
 import { IChallenges, IUser } from "../@types";
@@ -6,6 +6,7 @@ import { getUserById, getChallengesCreatedByUser } from "../api";
 import CreatedChall from "../components/CreatedChall";
 import CompletedChall from "../components/CompletedChall";
 import useAuthStore from "../store";
+import { useToast } from "../context/ToastContext";
 
 export default function Profil() {
 
@@ -21,11 +22,8 @@ export default function Profil() {
     const user = useAuthStore(state => state.user);
     const [player, setPlayer] = useState<IUser | null>(null);
     const [createdChallenges, setCreatedChallenges] = useState<IChallenges>([]);
-    const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-
-    const location = useLocation();
-    const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
+    const showToast = useToast();
 
 
     
@@ -45,37 +43,22 @@ export default function Profil() {
 
           setLoading(false);
 
-        } catch (err) {
-          setError("Erreur lors du chargement des données du profil.");
+        } catch (error) {
+          console.error(error);
+          showToast("Erreur lors du chargement des données du profil.", "error");
           setLoading(false);
-          console.error(err);
         }
       };
       loadProfilData();
 
-      if (successMessage) {
-        const timer = setTimeout(() => {
-          setSuccessMessage(null);
-        }, 5000); // 5000ms = 5 secondes
-  
-        // Nettoyer le timer si le composant est démonté
-        return () => clearTimeout(timer);
-      }
-    }, [id, successMessage]);
+      
+    }, [id, showToast]);
   
     if (loading) return <p>Chargement du profil...</p>;
-    if (error) return <p className="error-message">{error}</p>;
-      
-
+    if (!player) return <p>Profil introuvable.</p>;
     return (
         <>
             <main className="profile">
-
-            {successMessage && (
-              <div className="toast-message success-toast">
-                <span>{successMessage}</span>
-              </div>
-            )}
 
                 <div className="perso-info">
                   {user?.id === player?.id ? (

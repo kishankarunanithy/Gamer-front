@@ -2,6 +2,7 @@ import { useState } from "react";
 import "../App.css";
 import { addSubmissionToChallenge } from "../api";
 import useAuthStore from "../store";
+import { useToast } from "../context/ToastContext";
 
 interface SubmissionFormProps {
     close: () => void;
@@ -11,25 +12,24 @@ interface SubmissionFormProps {
 
 export default function SubmissionForm({ close, challengeId, onSuccess }: SubmissionFormProps){
     const [videoUrl, setVideoUrl] = useState("");
-    const [error, setError] = useState<string | null>(null);
+    const showToast = useToast();
 
     // Récupérer le token, il sera envoyé dans la requête HTTP vers l'API.
     const token = useAuthStore(state => state.token);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        setError(null);
 
         try {
             
             if (!token) {
-                setError("Connectes toi pour participer à un challenge.");
+                showToast("Connectes toi pour participer à un challenge.", "error");
                 return;
             }
 
             // Vérifier si l'URL de la vidéo est bien fournie.
             if (!videoUrl.trim()) {
-                setError("L'URL de la vidéo est obligatoire pour participer.");
+                showToast("L'URL de la vidéo est obligatoire pour participer.", "error");
                 return;
             }
 
@@ -42,9 +42,9 @@ export default function SubmissionForm({ close, challengeId, onSuccess }: Submis
 
             onSuccess();
             close();
-
         } catch(error) {
-            console.error("Erreur lors de l'enregistrement.", error)
+            console.error("Erreur lors de l'enregistrement.", error);
+            showToast("Erreur lors de l'enregistrement.", "error");
         }
     }
     
@@ -53,7 +53,6 @@ export default function SubmissionForm({ close, challengeId, onSuccess }: Submis
         <div className="default-form-container default-form default-box-design">
             <form onSubmit={handleSubmit}>
                 <p className="default-text">Envoie nous tes exploits !</p>
-                {error && <div className="error-toast">{error}</div>}
 
                 <input 
                     type="text"

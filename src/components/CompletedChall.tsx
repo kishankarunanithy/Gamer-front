@@ -5,6 +5,7 @@ import { getYoutubeEmbedUrl } from '../utils/youtube';
 import { useState } from 'react';
 import { deleteUserSubmission, updateUserSubmission } from '../api';
 import useAuthStore from '../store';
+import { useToast } from '../context/ToastContext';
 
 interface CompletedChallenge {
     challenge: IChallenge;
@@ -17,7 +18,7 @@ export default function CompletedChall({ challenge, userId }: CompletedChallenge
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [deleted, setDeleted] = useState(false);
-
+    const showToast = useToast();
     const embedUrl = getYoutubeEmbedUrl(videoUrl);
 
     const token = useAuthStore(state => state.token);
@@ -25,16 +26,15 @@ export default function CompletedChall({ challenge, userId }: CompletedChallenge
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        setError(null);
         setSuccess(false);
 
         if (!token) {
-            setError("Tu dois être connecté pour modifier ta participation.");
+            showToast("Tu dois être connecté pour modifier ta participation.", "error");
             return;
         }
 
         if (!videoUrl.trim()) {
-            setError("Le lien de la vidéo est obligatoire.");
+            showToast("Le lien de la vidéo est obligatoire.", "error");
             return;
         }
 
@@ -44,11 +44,11 @@ export default function CompletedChall({ challenge, userId }: CompletedChallenge
                 setSuccess(true);
                 setIsEditing(false);
             } else {
-                setError("La mise à jour à échoué.");
+                showToast("La mise à jour à échoué.", "error");
             }
         } catch (error) {
             console.error("Erreur lors de la mise à jour", error);
-            setError("Une erreur est survenue.");
+            showToast("Une erreur est survenue.", "error");
         }
     };
 
@@ -64,6 +64,7 @@ export default function CompletedChall({ challenge, userId }: CompletedChallenge
         try {
             const result = await deleteUserSubmission(userId, challenge.id, token);
             if (result) {
+                showToast("Ta participation a été supprimée avec succès.", "success");
                 setDeleted(true);
             } else {
                 setError("Erreur lors de la suppression.");
