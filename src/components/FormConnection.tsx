@@ -1,8 +1,9 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import useAuthStore from "../store";
-import { NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { getUserById, loginUser, forgotPasswordRequest, resetPasswordRequest } from "../api";
 import { IUser } from "../@types";
+import { useToast } from "../context/ToastContext";
 
 
 interface IUserProps {
@@ -67,11 +68,14 @@ function Input ({value, setValue, name, type, placeholder, label}: IInputProps) 
 }
 
 function Fileinput({setFile, name, label, accept}: IFileInputProps) {
+  const showToast = useToast();
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0]);
+      showToast("Avatar téléchargé avec succès !", "success");
     } else {
       setFile(null);
+      showToast("Format d'avatar invalide. Veuillez sélectionner une image.", "error");
     }
   };
 
@@ -97,20 +101,18 @@ function FormSubscribe ({addUser}: IUserProps) {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
+  const showToast = useToast();
   const handleSubmit = async(e: FormEvent) => {
     e.preventDefault()
-    setError(null);
 
     try {
       if (password !== confirmPassword) {
-        setError("Les mots de passe ne correspondent pas");
+        showToast("Les mots de passe ne correspondent pas", "error");
         return;
       }
 
       if (avatar && !(avatar instanceof File)) {
-        setError("Format d'avatar invalide. Veuillez sélectionner une image.");
+        showToast("Format d'avatar invalide. Veuillez sélectionner une image.", "error");
         return;
       }
 
@@ -125,16 +127,16 @@ function FormSubscribe ({addUser}: IUserProps) {
       const fileInput = document.getElementById("avatar") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
 
+      showToast("Inscription réussie !", "success");
+
     } catch (error) {
-      setError("Une erreur s'est produite lors de l'inscription");
+      showToast("Une erreur s'est produite lors de l'inscription", "error");
       console.error("Erreur d'inscription:", error);
     }
   };
 
   return <>
     <form onSubmit={handleSubmit} encType="multipart/form-data">
-      {error && <div className="error-message">{error}</div>}
-
       <Input 
         value={pseudo}
         setValue={setPseudo}
@@ -187,63 +189,49 @@ function FormSubscribe ({addUser}: IUserProps) {
 
 function FormLogin () {
 
-  const location = useLocation();
-  const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
-
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000); // 5000ms = 5 secondes
-
-      // Nettoyer le timer si le composant est démonté
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage]);
+  const showToast = useToast();
 
   const { login } = useAuthStore()
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [pseudoOrEmail, setPseudoOrEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async(e: FormEvent) => {
     e.preventDefault()
-    setError(null);
     
+
     try {
       const { token, userId } = await loginUser(pseudoOrEmail, password);
+
+      if (!token || !userId) {
+        showToast("Nom d'utilisateur ou mot de passe incorrect", "error");
+        return;
+      }
+
       const user = await getUserById(userId, token);
+      if (!user) {
+        showToast("Utilisateur non trouvé", "error");
+        return;
+      }
 
       login(user, token);
-     
+      showToast("Connexion réussie !", "success");
       //  Redirection dynamique
       const redirect = searchParams.get("redirect");
-      navigate(redirect || `/profile/${user.id}`);
+      navigate(redirect || `/profile/${user.id}`, { 
+        state: { 
+          successMessage: `Bienvenu ${user.pseudo} !` 
+        }
+      });
 
     } catch (error) {
-      setError("Échec de la connexion. Vérifiez vos identifiants.");
+      showToast("Échec de la connexion. Vérifiez vos identifiants.", "error");
       console.error("Erreur de connexion:", error);
     }
   };
   return <>
     <form onSubmit={handleSubmit}>
-      {error && <div className="error-message">{error}</div>}
-
-      {successMessage && (
-        <div className="toast-message success-toast">
-          <span>{successMessage}</span>
-          <button 
-            type="button"
-            className="toast-close"
-            onClick={() => setSuccessMessage(null)}
-            aria-label="Fermer le message"
-          >
-            ×
-          </button>
-        </div>
-      )}
 
       <Input 
         value={pseudoOrEmail}
@@ -275,9 +263,8 @@ function FormLogin () {
 function FormUpdateProfile({ initialUser, onUpdate }: FormUpdateProfileProps) {
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
-  const [avatar, setAvatar] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
+  const [avatar, setAvatar] = useState<File | null>(null);  
+  const showToast = useToast();
   
 
   useEffect(() => {
@@ -289,8 +276,13 @@ function FormUpdateProfile({ initialUser, onUpdate }: FormUpdateProfileProps) {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null);
-    await onUpdate(avatar, pseudo, email);
+    try {
+      await onUpdate(avatar, pseudo, email);
+      showToast("Profil mis à jour avec succès !", "success");
+    } catch (error) {
+      showToast("Une erreur s'est produite lors de la mise à jour du profil.", "error");
+      console.error("Erreur de mise à jour du profil:", error);
+    }
     setPseudo("");
     setEmail("");
     setAvatar(null);
@@ -300,8 +292,6 @@ function FormUpdateProfile({ initialUser, onUpdate }: FormUpdateProfileProps) {
 
   return (
     <form onSubmit={handleSubmit} encType="multipart/form-data">
-      {error && <div className="error-message">{error}</div>}
-
       <Input
         value={pseudo}
         setValue={setPseudo}
@@ -345,15 +335,13 @@ function FormUpdatePasswordProfile ({initialUser, onUpdatePassword}: UpdateProfi
   const [password, setPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
+  const showToast = useToast();
   const handleSubmit = async(e: FormEvent) => {
     e.preventDefault()
-    setError(null);
 
     try {
         if (newPassword !== confirmNewPassword) {
-          setError("Les mots de passe ne correspondent pas");
+          showToast("Les mots de passe ne correspondent pas", "error");
           return;
         }
 
@@ -362,21 +350,19 @@ function FormUpdatePasswordProfile ({initialUser, onUpdatePassword}: UpdateProfi
         setPassword("");
         setNewPassword("");
         setConfirmNewPassword("");
-        
+        showToast("Mot de passe mis à jour avec succès !", "success");
         //  Redirection dynamique
         const redirect = searchParams.get("redirect");
         navigate(redirect || `/profile/${initialUser.id}`);
         
     } catch (error) {
-      setError("Échec de la connexion. Vérifiez vos identifiants.");
+      showToast("Échec de la connexion. Vérifiez vos identifiants.", "error");
       console.error("Erreur de connexion:", error);
     }
   };
 
   return <>
     <form onSubmit={handleSubmit} encType="multipart/form-data">
-      {error && <div className="error-message">{error}</div>}
-
       <Input 
         value={password}
         setValue={setPassword}
@@ -416,17 +402,16 @@ const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const showToast = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError("");
     setMessage("");
 
     if (!email) {
-      setError("Veuillez saisir votre email.");
+      showToast("Veuillez saisir votre email.", "error");
       setIsSubmitting(false);
       return;
     }
@@ -435,9 +420,9 @@ const ForgotPasswordForm = () => {
       //* L'email est récupéré via le formualire et envoyé vers l'api
       const response = await forgotPasswordRequest(email);
       setMessage(response.message);
-      
+      showToast("Un lien de réinitialisation a été envoyé à votre email.", "success");
     } catch (error) {
-      setError("Une erreur est survenue. Veuillez réessayer");
+      showToast("Une erreur est survenue. Veuillez réessayer", "error");
       console.error("Erreur de connexion:", error);
     } finally {
       setIsSubmitting(false);
@@ -452,21 +437,13 @@ const ForgotPasswordForm = () => {
         </div>
       )}
       
-      {error && (
-        <div className="alert alert-danger">
-          {error}
-        </div>
-      )}
-
       {!message && (
         <form onSubmit={handleSubmit} encType="multipart/form-data">
-          {error && <div className="error-message">{error}</div>}
-
           <Input 
             value={email}
             setValue={setEmail}
             name="email"
-            placeholder="Votre addresse email"
+            placeholder="Votre adresse email"
             type="email" 
             label="Email"
           />
@@ -497,11 +474,10 @@ function ResetPasswordForm () {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
   const [token, setToken] = useState("");
   const [email, setEmail] = useState("");
   const [isValidToken, setIsValidToken] = useState(false);
-  
+  const showToast = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -516,14 +492,15 @@ function ResetPasswordForm () {
       setEmail(emailFormUrl);
       setIsValidToken(true);
     } else {
-      setError("Token ou email de réinitialisation manquant ou invalide.");
+      showToast("Token ou email de réinitialisation manquant ou invalide.", "error");
     }
-  }, [searchParams]);
+  }, [searchParams, showToast]);
 
   //* On créer un schéma de validation suplémentaire coté front
   const validatePassword = (password: string): boolean => {
     // Au minimum 8 caractères, au moins une lettre et un chiffre
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
+    
     return passwordRegex.test(password);
   };
 
@@ -531,22 +508,21 @@ function ResetPasswordForm () {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError("");
 
     if (!newPassword || !confirmNewPassword) {
-      setError("Veuillez remplir tous les champs.");
+      showToast("Veuillez remplir tous les champs.", "error");
       setIsSubmitting(false);
       return;
     }
 
     if (!validatePassword(newPassword)) {
-      setError("Le mot de passe doit contenir au moins 8 caractères, une lettre et un chiffre.");
+      showToast("Le mot de passe doit contenir au moins 8 caractères, une lettre et un chiffre.", "error");
       setIsSubmitting(false);
       return;
     }
 
     if (newPassword !== confirmNewPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+      showToast("Les mots de passe ne correspondent pas.", "error");
       setIsSubmitting(false);
       return;
     }
@@ -562,7 +538,7 @@ function ResetPasswordForm () {
 
       //* Si le payload est complet et valide il est envoyer vers la requette API
       await resetPasswordRequest(payload);
-      
+      showToast("Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.", "success");
       //* Redirection vers la page de connexion avec un message de succès
       navigate('/connexion', { 
         state: { 
@@ -571,9 +547,9 @@ function ResetPasswordForm () {
       });
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        showToast(error.message, "error");
       } else {
-        setError("Une erreur est survenue. Veuillez réessayer.");
+          showToast("Une erreur est survenue. Veuillez réessayer.", "error");
       }
       console.error("Erreur lors de la réinitialisation:", error);
     } finally {
@@ -585,7 +561,7 @@ function ResetPasswordForm () {
     return (
       <div className="error-container">
         <h3>Lien invalide</h3>
-        <p>{error}</p>
+        <p>Lien invalide, veuillez réessayer.</p>
         <button onClick={() => navigate('/mot-de-passe-oublie')}>
           Demander un nouveau lien
         </button>
@@ -596,8 +572,6 @@ function ResetPasswordForm () {
   return (
     <>
         <form onSubmit={handleSubmit} encType="multipart/form-data">
-          {error && <div className="error-message">{error}</div>}
-
           <Input 
             value={newPassword}
             setValue={setNewPassword}
@@ -615,12 +589,6 @@ function ResetPasswordForm () {
             type="password" 
             label="password"
           />
-
-          {error && (
-            <div className="error-message" role="alert">
-              {error}
-            </div>
-          )}
 
           <div className="form-button align-button">
             <button className="default-button" type="submit" disabled={isSubmitting}>

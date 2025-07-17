@@ -1,6 +1,6 @@
 import "../App.css";
-import { useEffect, useState, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { IChallenge } from "../@types/index";
 import useAuthStore from "../store"; // 🔒 pour vérifier si user connecté
 import { getChallenges } from "../api";
@@ -22,6 +22,9 @@ export default function Home() {
   const [populairesStartX, setPopulairesStartX] = useState(0);
   const [populairesScrollLeft, setPopulairesScrollLeft] = useState(0);
 
+  const location = useLocation();
+  const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
+
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
@@ -41,8 +44,19 @@ export default function Home() {
         console.error("Erreur lors du fetch des challenges :", error);
       }
     };
+
     fetchChallenges();
-  }, []);
+
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000); // 5000ms = 5 secondes
+
+      // Nettoyer le timer si le composant est démonté
+      return () => clearTimeout(timer);
+    }
+
+  }, [successMessage]);
 
   const handleNouveauteMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsNouveauteDragging(true);
@@ -110,6 +124,13 @@ export default function Home() {
 
   return (
     <main className="home-page">
+
+      {successMessage && (
+        <div className="toast-message success-toast">
+          <span>{successMessage}</span>
+        </div>
+      )}
+
       <section className="hero-layout">
         <div className="hero-left-image">
           <img src={heroLeftImage} alt="Image de gauche" />

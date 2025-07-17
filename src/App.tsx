@@ -17,6 +17,9 @@ import EditChallenge from "./pages/EditChallenge";
 import { UpdateProfile } from "./pages/UpdateProfile";
 import NotFound from "./pages/404NotFound";
 import { ResetPassword } from './pages/ResetPassword';
+import { ToastProvider } from './context/ToastContext';
+import Toastify from "./components/Toastify.js";
+import "./styles/toastify.css"
 
 
 
@@ -26,9 +29,9 @@ import { ResetPassword } from './pages/ResetPassword';
 function App() {
   
   return (
-    <>
-      
+    <ToastProvider>
       <Header />
+      <Toastify />
       <Routes>
         <Route path="/" element={<Home/>}/>
         <Route path="/challenges/" element={<Challenges />}/>
@@ -56,11 +59,9 @@ function App() {
         }/>
         <Route path="*" element={<NotFound />} />        
       </Routes>
+      <Toastify />
       <Footer />
-
-      
-     
-    </>
+    </ToastProvider>
   )
 }
 

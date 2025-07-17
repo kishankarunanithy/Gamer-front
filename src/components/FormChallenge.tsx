@@ -1,9 +1,10 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ICategory, IDifficulty } from "../@types";
+import { ICategory, IChallenge, IDifficulty } from "../@types";
 import { addChallengeToApi, getCategories, getDifficulties, updateChallenge } from "../api/index";
 import useAuthStore from "../store"; 
+import { useToast } from "../context/ToastContext";
 
 // Props optionnelles : une fonction à appeler après soumission du formulaire
 interface Props {
@@ -17,15 +18,15 @@ interface Props {
     difficulty_id: number;
   };
   isModal?: boolean;
+  existingChallenges?: IChallenge[];
 }
 
-function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal }: Props) {
+function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal, existingChallenges }: Props) {
   const navigate = useNavigate();
-
+  const showToast = useToast();
   // États pour stocker les catégories, difficultés et erreurs éventuelles
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [difficulties, setDifficulties] = useState<IDifficulty[]>([]);
-  const [error, setError] = useState<string>("");
 
   // État pour gérer les données du formulaire
   const [formData, setFormData] = useState({
@@ -44,7 +45,7 @@ function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal }: Pr
         if (Array.isArray(categoriesData)) {
           setCategories(categoriesData);
         } else {
-          console.error("Catégories non valides :", categoriesData);
+          showToast("Catégories non valides.", "error");
           setCategories([]);
         }
 
@@ -52,18 +53,19 @@ function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal }: Pr
         if(Array.isArray(difficultiesData)) {
           setDifficulties(difficultiesData);
         } else {
-          console.error("Difficultés non valides :", difficultiesData);
+          showToast("Difficultés non valides.", "error");
           setDifficulties([]);
         }
-      } catch (err) {
-        console.error("Erreur lors du chargement des données :", err);
+      } catch (error) {
+        console.error("Erreur lors du chargement des données :", error);
+        showToast("Erreur lors du chargement des données.", "error");
         setCategories([]);
         setDifficulties([]);
       }
     };
 
     fetchData();
-  }, []);
+  }, [showToast]);
 
   // Gère le changement de valeur dans les champs du formulaire
   const handleChange = (
@@ -76,10 +78,9 @@ function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal }: Pr
   // Envoie du formulaire à la base de données
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
         
     if (!user || !token) {
-      setError("Tu dois être connecté pour modifier ou créer un challenge.");
+      showToast("Tu dois être connecté pour modifier ou créer un challenge.", "error");
       return;
     }
   
@@ -90,21 +91,35 @@ function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal }: Pr
       difficulty_id: Number(formData.difficulty_id),
     };
 
+    
+    const nameExists = existingChallenges?.some(challenge => challenge.name === formData.name && challenge.id !== challengeId);
+        if (nameExists) {
+            showToast("Ce nom de challenge existe déjà. Veuillez en choisir un autre.", "error");
+            return; // Important: Arrêter la soumission si le nom existe déjà
+        }
   
     try {
       let responseData;
   
       if (challengeId) {
         responseData = await updateChallenge(challengeId, payload, token);
+        showToast("Votre challenge à été modifié avec succès.", "success");
       } else {
         responseData = await addChallengeToApi(payload, token);
+        showToast("Votre challenge à été crée avec succès.", "success");
       }
   
       if (onFormSubmit) onFormSubmit();
-      navigate(`/challenges/${responseData.id}`);
+
+      navigate(`/challenges/${responseData?.id}`, { 
+        state: { 
+          successMessage: "Votre challenge à été modifié avec succès.", 
+        }
+      });
   
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      console.error("Une erreur s'est produite.", error);
+      showToast("Une erreur s'est produite.", "error");
     }
   };
   
@@ -116,12 +131,6 @@ function FormChallenge({ onFormSubmit, challengeId, defaultValues, isModal }: Pr
     <p className="paragraph-center low-title">
       {challengeId ? "Modifier le Challenge" : "Créer un Challenge"}
     </p>
-
-    {error && (
-      <p style={{ color: "white", textAlign: "center", background: "red" }}>
-        {error}
-      </p>
-    )}
 
     <input
       type="text"
