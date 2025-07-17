@@ -112,14 +112,9 @@ export default function Leaderboard() {
                         </table>
                         
                     </section>
-                    <div className="block">
-
-                    </div>
                 </div>
-
-
             </main>
-            
+
         </>
     )
 }
