@@ -17,6 +17,9 @@ import EditChallenge from "./pages/EditChallenge";
 import { UpdateProfile } from "./pages/UpdateProfile";
 import NotFound from "./pages/404NotFound";
 import { ResetPassword } from './pages/ResetPassword';
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import LegalInformation from "./pages/LegalInformation";
+import AboutUs from "./pages/AboutUs";
 import { ToastProvider } from './context/ToastContext';
 import Toastify from "./components/Toastify.js";
 import "./styles/toastify.css"
@@ -57,6 +60,9 @@ function App() {
             <UpdateProfile />
           </RequireAuth>
         }/>
+        <Route path="/politique-confidentialite" element={<PrivacyPolicy />} />
+        <Route path="/mentions-legales" element={<LegalInformation />} />
+        <Route path="/a-propos" element={<AboutUs />} />
         <Route path="*" element={<NotFound />} />        
       </Routes>
       <Toastify />
