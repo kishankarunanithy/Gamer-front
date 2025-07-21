@@ -122,6 +122,8 @@ export default function Home() {
             Montrez-nous ce que vous avez dans le ventre !<br />
             Postez vos vidéos, défiez les autres, et grimpez au sommet.
           </h2>
+          <h2 style={{ color: 'limegreen' }}>✅ Test prod déploiement OK</h2>
+
           <div className="hero-buttons buttons-flex">
             <button
               className="default-button "
