@@ -6,18 +6,19 @@ import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store";
 import { deleteUser } from "../api";
 import  logout  from "../pages/logout";
+import { useToast } from "../context/ToastContext";
+
 function UpdateProfile () {
 
   const navigate = useNavigate();
   const { user, token, login } = useAuthStore();
   const [currentUser, setCurrentUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  const showToast = useToast();
   useEffect(() => {
       const fetchProfile = async () => {
         if (!user?.id || !token) {
-          setError("Vous devez être connecté pour modifier votre profil.");
+          showToast("Vous devez être connecté pour modifier votre profil.", "error");
           setLoading(false);
           return;
         }
@@ -26,14 +27,14 @@ function UpdateProfile () {
           setCurrentUser(userData);
           setLoading(false);
         } catch (err) {
-          setError("Erreur lors du chargement de votre profil.");
+          showToast("Erreur lors du chargement de votre profil.", "error");
           console.error(err);
           setLoading(false);
         }
       };
   
       fetchProfile();
-    }, [user?.id, token]);
+    }, [user?.id, token, showToast]);
 
     const handleUpdateProfile = async (
       avatar: File | null,
@@ -41,7 +42,7 @@ function UpdateProfile () {
       email: string,
     ) => {
       if (!user?.id || !token) {
-        setError("Vous devez être connecté pour modifier votre profil.");
+        showToast("Vous devez être connecté pour modifier votre profil.", "error");
         return;
       }
       try {
@@ -54,13 +55,14 @@ function UpdateProfile () {
         );
         
         if (updatedUser) {
+          showToast("Votre profil a été mis à jour avec succès.", "success");
           login(updatedUser, token);
           navigate(`/profile/${user.id}`);
         } else {
-          setError("La mise à jour du profil a échoué.");
+          showToast("La mise à jour du profil a échoué.", "error");
         }
       } catch (err) {
-        setError("Erreur lors de la mise à jour de votre profil.");
+        showToast("Erreur lors de la mise à jour de votre profil.", "error");
         console.error(err);
       }
     };
@@ -71,7 +73,7 @@ function UpdateProfile () {
       confirmNewPassword: string,
     ) => {
       if (!user?.id || !token) {
-        setError("Vous devez être connecté pour modifier votre mot de passe.");
+        showToast("Vous devez être connecté pour modifier votre mot de passe.", "error");
         return;
       }
       try {
@@ -84,13 +86,14 @@ function UpdateProfile () {
         );
         
         if (updatedUserPassword) {
+          showToast("Votre mot de passe a été mis à jour avec succès.", "success");
           login(user, token);
           navigate(`/profile/${user.id}`);
         } else {
-          setError("La mise à jour du profil a échoué.");
+          showToast("La mise à jour du profil a échoué.", "error");
         }
       } catch (err) {
-        setError("Erreur lors de la mise à jour de votre profil.");
+        showToast("Erreur lors de la mise à jour de votre profil.", "error");
         console.error(err);
       }
     };
@@ -101,7 +104,7 @@ function UpdateProfile () {
       if (!confirmDelete) return;
   
       if (!token || !user?.id) {
-        setError("Non autorisé.");
+        showToast("Non autorisé.", "error");
         return;
       }
   
@@ -109,21 +112,21 @@ function UpdateProfile () {
       try {
         const success = await deleteUser(user.id, token);
         if (success) {
+          showToast("Votre compte a été supprimé avec succès.", "success");
           logout();
           navigate("/");
         } else {
-          setError("Échec de la suppression du compte.");
+          showToast("Échec de la suppression du compte.", "error");
         }
       } catch (err) {
-        setError("Erreur lors de la suppression du compte.");
+        showToast("Erreur lors de la suppression du compte.", "error");
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (loading) return <p>Chargement de votre profil...</p>;
-    if (error) return <p className="error-message">{error}</p>;
+    if (loading) return <p>Chargement de votre profil...</p>; 
     if (!currentUser) return <p>Profil non trouvé.</p>;
   
 

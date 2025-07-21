@@ -1,0 +1,79 @@
+/* Styles personnalisés pour les toasts */
+.Toastify__toast {
+  padding: 20px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 0px;
+  font-size: 18px;
+  min-height: 70px;
+}
+
+/* Style pour les toasts de succès */
+.Toastify__toast--success {
+  background: rgb(104, 249, 124);
+  opacity: 0.9;
+  color: white;
+}
+
+/* Style pour les toasts d'erreur */
+.Toastify__toast--error {
+  background: rgb(255, 102, 102);
+  opacity: 0.9;
+  color: white;
+}
+
+/* Style pour les toasts d'information */
+.Toastify__toast--info {
+  background: rgb(120, 215, 253);
+  opacity: 0.9;
+  color: rgb(0, 0, 0);
+}
+
+/* Style pour les toasts d'avertissement */
+.Toastify__toast--warning {
+  background: rgb(255, 255, 156);
+  opacity: 0.9;
+  color: white;
+}
+
+/* Style pour le bouton de fermeture */
+.Toastify__close-button {
+  color: white;
+  opacity: 1;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
+}
+
+/* Style pour le contenu du toast */
+.Toastify__toast-body {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Animation d'entrée */
+.Toastify__toast--enter {
+  transform: translateX(100%);
+}
+
+.Toastify__toast--enter-active {
+  transform: translateX(0);
+  transition: transform 300ms ease-in;
+}
+
+/* Animation de sortie */
+.Toastify__toast--exit {
+  transform: translateX(0);
+}
+
+.Toastify__toast--exit-active {
+  transform: translateX(100%);
+  transition: transform 300ms ease-in;
+}
+
+.Toastify__progress-bar {
+  border-radius: 0px;
+}

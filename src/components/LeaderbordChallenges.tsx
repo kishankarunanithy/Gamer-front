@@ -31,7 +31,7 @@ export default function LeaderboardTopChallenges({ challenge, index}: Leaderboar
 
     return (
         <>
-            <td className="array-content">
+            <tr className="array-content">
                 <td>
                     <Link to={`/challenges/${challenge.id}`} className={className}>{medal}</Link>
                 </td>
@@ -41,7 +41,7 @@ export default function LeaderboardTopChallenges({ challenge, index}: Leaderboar
                 <td>
                 <Link to={`/challenges/${challenge.id}`} className={className}>{challenge.users.length}</Link>
                 </td>
-            </td>
+            </tr>
         </>
     )
 }

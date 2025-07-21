@@ -5,6 +5,7 @@ import { deleteChallenge, getChallengeById } from "../api";
 import SubmissionForm from "../components/SubmissionForm";
 import useAuthStore from "../store";
 import { getYoutubeEmbedUrl } from "../utils/youtube";
+import { useToast } from "../context/ToastContext";
 
 export default function Challenge() {
   const { id } = useParams();
@@ -12,6 +13,7 @@ export default function Challenge() {
   const [challenge, setChallenge] = useState<IChallenge | null>(null);
   const { user, token } = useAuthStore();
   const [showForm, setShowForm] = useState(false);
+  const showToast = useToast();
 
   const loadData = useCallback(async () => {
     if (id) {
@@ -24,6 +26,7 @@ export default function Challenge() {
     loadData();
   }, [loadData]);
 
+
   const handleDelete = async () => {
     if (!challenge) return;
     if (!token) {
@@ -34,13 +37,19 @@ export default function Challenge() {
     if (confirm("Es-tu sûr de vouloir supprimer ce challenge ?")) {
       try {
         await deleteChallenge(challenge.id, token);
-        alert("Challenge supprimé !");
-        navigate("/");
+
+        navigate('/');
+        showToast("Challenge supprimé avec succès.", "success");
       } catch (error) {
         console.error("Erreur suppression :", error);
         alert("Erreur lors de la suppression.");
       }
     }
+  };
+
+  const handleSubmissionSuccess = () => {
+    showToast("Votre participation a été enregistrée avec succès !", "success");
+    loadData(); // Recharge les données pour afficher la nouvelle participation
   };
 
   if (!challenge) {
@@ -87,13 +96,14 @@ export default function Challenge() {
                   </button>
                 </div>
               )}
-
-              <span className="category-color default-tag-design" style={{ backgroundColor: challenge.category.color }}>
-                {challenge.category.name}
-              </span>
-              <span className="difficulty-color default-tag-design" style={{ backgroundColor: challenge.difficulty.color }}>
-                {challenge.difficulty.name}
-              </span>
+              <div className="span-cat-and-diff">
+                <span className="category-color default-tag-design" style={{ backgroundColor: challenge.category.color }}>
+                  {challenge.category.name}
+                </span>
+                <span className="difficulty-color default-tag-design" style={{ backgroundColor: challenge.difficulty.color }}>
+                  {challenge.difficulty.name}
+                </span>
+              </div>
             </div>
 
             <article className="challenge-description">
@@ -101,7 +111,6 @@ export default function Challenge() {
             </article>
           </section>
         </div>
-
         <div className="align-button">
           {user ? (
             <button className="default-button" onClick={() => setShowForm(true)}>
@@ -114,10 +123,9 @@ export default function Challenge() {
           )}
         </div>
       </section>
-
       {showForm && challenge?.id !== undefined && (
         <section className="submission-form-section">
-          <SubmissionForm close={() => setShowForm(false)} challengeId={challenge.id} onSuccess={loadData} />
+          <SubmissionForm close={() => setShowForm(false)} challengeId={challenge.id} onSuccess={handleSubmissionSuccess} />
         </section>
       )}
 
