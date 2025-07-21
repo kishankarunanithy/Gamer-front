@@ -1,5 +1,6 @@
 // Toastify.js
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+
 import { ToastContainer, ToastPosition } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/toastify.css';
