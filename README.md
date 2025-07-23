@@ -1,54 +1,127 @@
-# React + TypeScript + Vite
+# 🎮 Gamer Challenges
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Plateforme fictive de défis de jeux vidéo, réalisée dans le cadre du projet de fin de formation DWWM (Développeur Web et Web Mobile).
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Présentation
 
-## Expanding the ESLint configuration
+Gamer Challenges est une application web permettant aux joueurs de créer, partager et relever des défis autour de leurs jeux vidéo favoris. Les utilisateurs peuvent poster leurs performances en vidéo, participer à des classements, et interagir avec la communauté.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Ce projet a été développé en 4 sprints d'une semaine, selon une organisation Agile.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+---
+
+## ✨ Fonctionnalités principales
+
+- Création de défis personnalisés avec vidéo YouTube
+- Soumission de vidéos pour répondre aux défis
+- Classements (leaderboards) pour joueurs et défis
+- Profils utilisateurs personnalisés
+- Système d’authentification sécurisé (inscription/connexion)
+- Responsive design (mobile, tablette, desktop)
+- Modération et gestion des contenus
+
+---
+
+## 🛠️ Stack technique
+
+### Frontend
+- React.js + TypeScript
+- Vite
+- Zustand (gestion d’état)
+- React Router
+- CSS personnalisé
+- Hébergement : **Vercel**
+
+### Backend
+- Node.js + Express
+- Base de données SQL
+- JWT (authentification)
+- Multer (upload fichiers)
+- Nodemailer (emails)
+- Hébergement : **Railway**
+
+### Outils & Déploiement
+- Git & GitHub (versioning/collaboration)
+- Méthodologie Agile (4 sprints)
+
+---
+
+## 👥 Équipe & Rôles
+
+- **Sandrine** : Product Owner, Développeuse Full-Stack
+- **Kishan** : Scrum Master & Lead Dev Front, Développeur Full-Stack
+- **Mathias** : Lead Dev Back, Développeur Full-Stack
+- **Benjamin** : Git Master, Développeur Full-Stack
+
+---
+
+## 📁 Structure du projet (frontend)
+
+```
+├── public/
+├── src/
+│   ├── api/
+│   ├── assets/
+│   ├── components/
+│   ├── context/
+│   ├── pages/
+│   ├── store/
+│   ├── styles/
+│   └── utils/
+├── App.tsx
+├── App.css
+├── index.html
+└── ...
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## ⚙️ Installation & lancement local
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+1. **Cloner le dépôt**
+   ```bash
+   git clone [URL_DU_DEPOT]
+   cd gamer-challenges-front
+   ```
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
+3. **Lancer le projet en développement**
+   ```bash
+   npm run dev
+   ```
+4. **Accéder à l’application**
+   - Ouvrir [http://localhost:5173](http://localhost:5173) dans votre navigateur
+
+> ⚠️ Le backend doit être lancé séparément (voir dossier `/gamer-challenges-back`).
+
+---
+
+## 🌍 Déploiement
+
+- **Frontend** : [Vercel](https://vercel.com)
+- **Backend** : [Railway](https://railway.app)
+
+---
+
+## 🔗 Liens utiles
+
+- [À propos](./src/pages/AboutUs.tsx)
+- [Mentions légales](./src/pages/LegalInformation.tsx)
+- [Politique de confidentialité](./src/pages/PrivacyPolicy.tsx)
+- [Documentation API (Swagger)](../gamer-challenges-back/docs/swagger.yaml)
+
+---
+
+## 🙏 Remerciements & contexte
+
+Ce projet a été réalisé dans le cadre de la formation DWWM (Développeur Web et Web Mobile). Il nous a permis de mettre en pratique nos compétences en développement web, travail d’équipe, gestion de projet Agile et déploiement cloud.
+
+Merci à tous les formateurs et à l’équipe pour cette belle aventure !
+
+---
+
+**Projet fictif à but pédagogique.**
