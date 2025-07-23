@@ -1,0 +1,65 @@
+src
+├── @types
+│   └── index.ts
+├── App.css
+├── App.tsx
+├── api
+│   └── index.ts
+├── assets
+│   ├── Capture_d_écran_2025-05-18_à_11.30.20-removebg-preview.png
+│   ├── Capture_d_écran_2025-05-18_à_11.30.20-removebg-preview.png
+│   ├── astronaute-mignon-agitant-main-controleur-jeu-cartoon-vector-icon-illustration-concept-icone-science-technologie-isole-vecteur-premium-style-dessin-anime-plat.png
+│   ├── dino-home.png
+│   ├── dino-login.png
+│   ├── dino-signup.png
+│   └── logo-transparent.svg
+├── components
+│   ├── ChallengesCard.tsx
+│   ├── CompletedChall.tsx
+│   ├── CreatedChall.tsx
+│   ├── Footer.tsx
+│   ├── FormChallenge.tsx
+│   ├── FormConnection.tsx
+│   ├── Header
+│   │   ├── BurgerIcon.tsx
+│   │   ├── CloseIcon.tsx
+│   │   ├── index.tsx
+│   │   └── style.css
+│   ├── LeaderboardPlayers.tsx
+│   ├── LeaderbordChallenges.tsx
+│   ├── Profile.tsx
+│   ├── ProtectedRoute
+│   │   └── RequireAuth.tsx
+│   ├── SubmissionForm.tsx
+│   └── Toastify.tsx
+├── context
+│   └── ToastContext.tsx
+├── index.css
+├── main.tsx
+├── pages
+│   ├── 404NotFound.tsx
+│   ├── AboutUs.tsx
+│   ├── Challenge.tsx
+│   ├── Challenges.tsx
+│   ├── Connexion.tsx
+│   ├── Creation.tsx
+│   ├── EditChallenge.tsx
+│   ├── ForgotPasswordForm.tsx
+│   ├── Home.tsx
+│   ├── Leaderboard.tsx
+│   ├── LegalInformation.tsx
+│   ├── PrivacyPolicy.tsx
+│   ├── Profil.tsx
+│   ├── ResetPassword.tsx
+│   ├── UpdateProfile.tsx
+│   └── logout.tsx
+├── store
+│   └── index.ts
+├── styles
+│   └── toastify.css
+├── utils
+│   └── youtube.ts
+└── vite-env.d.ts
+/f  [error opening dir]
+
+12 directories, 50 files
